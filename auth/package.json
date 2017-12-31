@@ -1,0 +1,31 @@
+{
+  "name": "@plexsso/auth",
+  "version": "1.0.0",
+  "description": "Backend of plexsso",
+  "main": "src/index.js",
+  "dependencies": {
+    "config": "^1.29.0",
+    "cookie-session": "^2.0.0-beta.3",
+    "express": "^4.16.2",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "main": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrkno/PlexSSO.git"
+  },
+  "keywords": [
+    "plex",
+    "sso"
+  ],
+  "author": "Matthew Knox",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mrkno/PlexSSO/issues"
+  },
+  "homepage": "https://github.com/mrkno/PlexSSO#readme"
+}

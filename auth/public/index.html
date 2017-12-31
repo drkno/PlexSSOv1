@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="author" content="Matthew Knox">
+<head>
+    <title>410, That's An Error</title>
+    <style>
+        #errorBox {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 150px;
+            border: 2px solid red;
+            text-align: center;
+            color: red;
+            font-family: 'Arial', 'Helvetica', san-serif, serif;
+        }
+
+        #errorCode {
+            font-weight: bold;
+            font-size: 110px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        #errorQuote {
+            font-weight: lighter;
+            font-size: 10px;
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+        }
+
+        #footer {
+            color: #DCDCDC;
+            font-weight: lighter;
+            font-size: 10px;
+            font-family: 'Arial', 'Helvetica', san-serif, serif;
+            text-align: center;
+            left: 0;
+            width: 100%;
+            bottom: 5px;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div id="errorBox">
+        <div id="errorCode">410</div>
+        <div id="errorQuote">
+            If you are seeing this you fucked up.
+            <br />
+            Retry deployment?
+        </div>
+    </div>
+    <div id="footer">Another useless Matthew Knox creation.</div>
+</body>
+</html>
