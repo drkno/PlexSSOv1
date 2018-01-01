@@ -88,13 +88,13 @@ const main = async() => {
             try {
                 body = JSON.parse(body);
             }
-            catch (e) {
-                body = {
-                    user: {
-                        authentication_token: ''
-                    }
-                };
-            }
+            catch (e) {}
+
+            body = body || {
+                user: {
+                    authentication_token: ''
+                }
+            };
 
             request(`https://plex.tv/api/resources?includeHttps=1&includeRelay=1&X-Plex-Product=PlexSSO&X-Plex-Client-Identifier=PlexSSOv1&X-Plex-Token=${data.user.authentication_token}`,
                 (err2, r2, body2) => {
