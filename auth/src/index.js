@@ -90,11 +90,9 @@ const main = async() => {
             }
             catch (e) {}
 
-            data = data || {
-                user: {
-                    authentication_token: ''
-                }
-            };
+            data = data || {};
+            data.user = data.user || {};
+            data.user.authentication_token = data.user.authentication_token || '';
 
             request(`https://plex.tv/api/resources?includeHttps=1&includeRelay=1&X-Plex-Product=PlexSSO&X-Plex-Client-Identifier=PlexSSOv1&X-Plex-Token=${data.user.authentication_token}`,
                 (err2, r2, body2) => {
