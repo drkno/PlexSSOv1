@@ -4,5 +4,6 @@
     "ombi": "http://pms.makereti.co.nz",
     "keybits": 512,
     "keycount": 5,
-    "sessionexpiry": 86400000
+    "sessionexpiry": 86400000,
+    "domain": ""
 }

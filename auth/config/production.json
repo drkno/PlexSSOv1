@@ -1,0 +1,9 @@
+{
+    "webroot": "../sso/build",
+    "port": 4200,
+    "ombi": "http://localhost:5000",
+    "keybits": 512,
+    "keycount": 5,
+    "sessionexpiry": 86400000,
+    "domain": "pms.makereti.co.nz"
+}
