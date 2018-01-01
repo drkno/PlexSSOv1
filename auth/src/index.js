@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const request = require('request');
+const xml2js = require('xml2js');
 const crypto = require('crypto');
 const util = require('util');
 
@@ -86,24 +87,43 @@ const main = async() => {
                 data = null;
             try {
                 body = JSON.parse(body);
-                if (err || body.error) {
-                    throw new Error('Something went wrong');
-                }
-                success = true;
-                data = body;
             }
             catch (e) {
-                data = 'Login failed. Please check your login details.';
+                body = {
+                    user: {
+                        authentication_token: ''
+                    }
+                };
             }
 
-            req.session.data = encrypt({
-                nowInMinutes: Math.floor(Date.now() / 60e3),
-                loginStatus: success
-            }, cekey);
+            request(`https://plex.tv/api/resources?includeHttps=1&includeRelay=1&X-Plex-Product=PlexSSO&X-Plex-Client-Identifier=PlexSSOv1&X-Plex-Token=${data.user.authentication_token}`,
+                (err2, r2, body2) => {
+                xml2js.parseString(body2, (err3, result) => {
+                    if (err || err2 || err3) {
+                        result = {
+                            MediaContainer: {
+                                Device: []
+                            }
+                        }
+                    }
+                    const servers = result.MediaContainer.Device.map(d => d['$'].name);
+                    if (servers.indexOf(config.get('plexservername')) >= 0) {
+                        success = true;
+                        data = body;
+                    }
+                    else {
+                        data = 'Login failed. Please check your login details.';
+                        req.session.data = encrypt({
+                            nowInMinutes: Math.floor(Date.now() / 60e3),
+                            loginStatus: success
+                        }, cekey);
 
-            res.status(success ? 200 : 401).json({
-                success: success,
-                data: data
+                        res.status(success ? 200 : 401).json({
+                            success: success,
+                            data: data
+                        });
+                    }
+                });
             });
         });
     });
