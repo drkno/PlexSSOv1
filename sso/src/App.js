@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AlertList, Alert, AlertContainer } from 'react-bs-notifier';
+import { AlertList } from 'react-bs-notifier';
 import './App.css';
 
 class App extends Component {
@@ -8,24 +8,53 @@ class App extends Component {
         username: '',
         password: '',
         remember: false,
-        alerts: [
-            {
-                id: (new Date()).getTime(),
-                type: "danger",
-                headline: `Whoa!`,
-                message: "k"
-            }
-        ]
+        focus: 0,
+        alerts: [],
+        loggedIn: false
     };
 
     async componentWillMount() {
+        const loggedInReq = await fetch('/api/v1/sso', {
+            credentials: 'include'
+        });
+        loggedInReq.json().then(data => {
+            this.setState({
+                loggedIn: data.success
+            });
+        });
+        const username = localStorage.getItem('username');
+        const password = localStorage.getItem('password');
+        this.setState({
+            username: username || '',
+            password: password || '',
+            remember: !!(username || password),
+            focus: [username, password, null].indexOf(null)
+        });
         const req = await fetch('/api/v1/background/');
         const data = await req.json();
         this.setState({
-            background: data.url,
-            username: localStorage.getItem('username') || '',
-            password: localStorage.getItem('password') || ''
+            background: data.url
         });
+    }
+
+    createAlert(message, type) {
+        const prev = this.state.alerts[this.state.alerts.length - 1];
+        const id = (prev && prev.id + 1) || 0;
+        const alerts = this.state.alerts.slice();
+        alerts.push({
+            id: id,
+            type: type,
+            message: message
+        });
+        this.setState({
+            alerts: alerts
+        });
+        setTimeout(() => {
+            const otherAlerts = this.state.alerts.slice().filter(a => a.id !== id);
+            this.setState({
+                alerts: otherAlerts
+            });
+        }, 3000);
     }
 
     async login() {
@@ -41,7 +70,9 @@ class App extends Component {
         try {
             const req = await fetch('/api/v1/login', {
                 method: 'post',
-                body: encodeURIComponent(`username=${this.state.username}&password=${this.state.password}`)
+                body: `username=${encodeURIComponent(this.state.username)}&password=${encodeURIComponent(this.state.password)}`,
+                headers: new Headers({'content-type': 'application/x-www-form-urlencoded'}),
+                credentials: 'include'
             });
             const data = await req.json();
             if (data.success) {
@@ -56,19 +87,26 @@ class App extends Component {
         }
     }
 
-    loginSuccess(...data) {
-        console.log('success');
-        console.log(data);
+    loginSuccess(data) {
+        const username = data.data.user.username;
+        const avatar = data.data.user.thumb;
+        this.createAlert(
+            (
+                <img src={avatar} alt={`Login successful, welcome back ${username}.`} />
+            ), 'success');
+        this.setState({
+            loggedIn: true
+        });
     }
 
     loginFailure(data) {
-        if (!data) {
+        if (!data || !data.data) {
             data = {
                 success: false,
-                error: 'An unknown error occurred.'
+                data: 'An unknown error occurred.'
             };
         }
-        
+        this.createAlert(data.data, 'danger');
     }
 
     toggleRemember() {
@@ -77,19 +115,63 @@ class App extends Component {
         });
     }
 
+    onInputChange(field, event) {
+        const change = {};
+        change[field] = event.target.value;
+        this.setState(change);
+    }
+
     render() {
         return (
-            <div className="App" style={{backgroundImage: `linear-gradient(-10deg, transparent 20%, rgba(0, 0, 0, 0.7) 20%, rgba(0, 0, 0, 0.7) 80%, transparent 80%), url("${this.state.background}")`}}>
+            <div className="App"
+                 style={{backgroundImage: `linear-gradient(-10deg, transparent 20%, rgba(0, 0, 0, 0.7) 20%, rgba(0, 0, 0, 0.7) 80%, transparent 80%), url("${this.state.background}")`}}>
+                <AlertList alerts={this.state.alerts} />
                 <div className="card login-card">
-                    <img className="card-img-top login-logo" src="/logo.png" alt="Logo" />
-                    <input className="form-control login-input-field" type="text" placeholder="Username" autoFocus />
-                    <input className="form-control login-input-field" type="password" placeholder="Password" />
-                    <label className={`login-remember-me-checkbox-${this.state.remember ? '' : 'un'}checked login-remember-me-checkbox`} onClick={() => this.toggleRemember()}>Remember Me</label>
-                    <br />
-                    <button type="button" className="btn btn-success" onClick={() => this.login()}>Sign in</button>
-                    <a href="https://www.plex.tv/sign-in/password-reset/" className="login-forgotten-link "><b>Forgot your password?</b></a>
+                    {this.state.loggedIn ? this.renderLogout() : this.renderLogin()}
                 </div>
             </div>
+        );
+    }
+
+    renderLogout() {
+        return (
+            <form id="logoutForm" onSubmit={e => e.preventDefault() && this.logout()}>
+                <img className="card-img-top login-logo" src="/logo.png" alt="Logo" />
+                <label className="logout-label">You already appear to be logged in.</label>
+                <br />
+                <button type="submit"
+                        className="btn btn-danger"
+                        onClick={() => this.logout()}
+                        autoFocus>Logout</button>
+            </form>
+        );
+    }
+
+    renderLogin() {
+        return (
+            <form id="loginForm" onSubmit={e => e.preventDefault() && this.login()}>
+                <img className="card-img-top login-logo" src="/logo.png" alt="Logo" />
+                <input className="form-control login-input-field"
+                       type="text"
+                       placeholder="Username"
+                       onChange={e => this.onInputChange('username', e)}
+                       value={this.state.username}
+                       autoFocus={this.state.focus === 0} />
+                <input className="form-control login-input-field"
+                       type="password" placeholder="Password"
+                       onChange={e => this.onInputChange('password', e)}
+                       value={this.state.password}
+                       autoFocus={this.state.focus === 1} />
+                <label className={`login-remember-me-checkbox-${this.state.remember ? '' : 'un'}checked login-remember-me-checkbox`}
+                       onClick={() => this.toggleRemember()}>Remember Me</label>
+                <br />
+                <button type="submit"
+                        className="btn btn-success"
+                        onClick={() => this.login()}
+                        autoFocus={this.state.focus === 2} >Sign in</button>
+                <a href="https://www.plex.tv/sign-in/password-reset/"
+                   className="login-forgotten-link "><b>Forgot your password?</b></a>
+            </form>
         );
     }
 }

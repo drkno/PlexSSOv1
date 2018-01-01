@@ -1,5 +1,6 @@
 const config = require('config');
 const express = require('express');
+const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const request = require('request');
 const crypto = require('crypto');
@@ -29,7 +30,7 @@ const newKey = async() => {
 const main = async() => {
     const app = express();
 
-    app.use(express.urlencoded({ extended: false }));
+    app.use(bodyParser.urlencoded({ extended: true }));
 
     const cekey = await newKey();
 
@@ -66,7 +67,6 @@ const main = async() => {
     });
 
     app.post('/api/v1/login', (req, res) => {
-        console.log(req);
         const username = req.body.username || '';
         const password = req.body.password || '';
         request({
@@ -81,23 +81,28 @@ const main = async() => {
             },
             body: `user[login]=${username}&user[password]=${password}`
         }, (err, r, body) => {
+            let success = false,
+                data = null;
             try {
                 body = JSON.parse(body);
                 if (err || body.error) {
                     throw new Error('Something went wrong');
                 }
+                success = true;
+                data = body;
             }
             catch (e) {
-                res.status(401).json({
-                    success: false,
-                    error: 'Login failed. Please check your login details.'
-                });
-                return;
+                data = 'Login failed. Please check your login details.';
             }
 
-            res.status(200).json({
-                success: true,
-                detail: body
+            req.session.data = encrypt({
+                nowInMinutes: Math.floor(Date.now() / 60e3),
+                loginStatus: success
+            }, cekey);
+
+            res.status(success ? 200 : 401).json({
+                success: success,
+                data: data
             });
         });
     });
