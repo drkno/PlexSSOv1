@@ -86,11 +86,11 @@ const main = async() => {
             let success = false,
                 data = null;
             try {
-                body = JSON.parse(body);
+                data = JSON.parse(body);
             }
             catch (e) {}
 
-            body = body || {
+            data = data || {
                 user: {
                     authentication_token: ''
                 }
