@@ -106,8 +106,14 @@ const main = async() => {
                             }
                         }
                     }
-                    const servers = result.MediaContainer.Device.map(d => d['$'].name);
-                    if (servers.indexOf(config.get('plexservername')) >= 0) {
+                    let exists = false;
+                    try {
+                        const servers = result.MediaContainer.Device.map(d => d['$'].name);
+                        exists = servers.indexOf(config.get('plexservername')) >= 0;
+                    }
+                    catch (e) {}
+
+                    if (exists) {
                         success = true;
                         data = body;
                     }
