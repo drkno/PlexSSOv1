@@ -121,6 +121,22 @@ class App extends Component {
         this.setState(change);
     }
 
+    async logout() {
+        const req = await fetch('/api/v1/logout', {
+            credentials: 'include'
+        });
+        const data = await req.json();
+        if (data.success) {
+            this.setState({
+                loggedIn: false
+            });
+            this.createAlert('Logout successful.', 'success');
+        }
+        else {
+            this.createAlert('An unknown error occurred while logging out.', 'danger');
+        }
+    }
+
     render() {
         return (
             <div className="App"
@@ -135,7 +151,7 @@ class App extends Component {
 
     renderLogout() {
         return (
-            <form id="logoutForm" onSubmit={e => e.preventDefault() && this.logout()}>
+            <form id="logoutForm" onSubmit={e => e.preventDefault() && this.logout()} style={{textAlign: 'center'}}>
                 <img className="card-img-top login-logo" src="/logo.png" alt="Logo" />
                 <label className="logout-label">You already appear to be logged in.</label>
                 <br />

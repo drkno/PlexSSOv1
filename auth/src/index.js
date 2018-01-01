@@ -107,6 +107,16 @@ const main = async() => {
         });
     });
 
+    app.get('/api/v1/logout', (req, res) => {
+        req.session.data = encrypt({
+            nowInMinutes: Math.floor(Date.now() / 60e3),
+            loginStatus: false
+        }, cekey);
+        res.status(200).json({
+            success: true
+        });
+    });
+
     app.use(express.static(config.get('webroot')));
 
     app.get('*', (req, res) => {
