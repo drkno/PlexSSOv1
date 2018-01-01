@@ -117,16 +117,16 @@ const main = async() => {
                     }
                     else {
                         data = 'Login failed. Please check your login details.';
-                        req.session.data = encrypt({
-                            nowInMinutes: Math.floor(Date.now() / 60e3),
-                            loginStatus: success
-                        }, cekey);
-
-                        res.status(success ? 200 : 401).json({
-                            success: success,
-                            data: data
-                        });
                     }
+                    req.session.data = encrypt({
+                        nowInMinutes: Math.floor(Date.now() / 60e3),
+                        loginStatus: success
+                    }, cekey);
+
+                    res.status(success ? 200 : 401).json({
+                        success: success,
+                        data: data
+                    });
                 });
             });
         });

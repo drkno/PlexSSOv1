@@ -34,8 +34,8 @@
       <file leaf-file-name="index.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../auth/src/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
-              <caret line="89" column="13" lean-forward="true" selection-start-line="89" selection-start-column="13" selection-end-line="89" selection-end-column="13" />
+            <state relative-caret-position="248">
+              <caret line="118" column="80" lean-forward="false" selection-start-line="118" selection-start-column="80" selection-end-line="118" selection-end-column="80" />
               <folding />
             </state>
           </provider>
@@ -322,12 +322,12 @@
       <workItem from="1514078382792" duration="3206000" />
       <workItem from="1514591553250" duration="2925000" />
       <workItem from="1514670193013" duration="23452000" />
-      <workItem from="1514847478924" duration="2732000" />
+      <workItem from="1514847478924" duration="2834000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="45481000" />
+    <option name="totallyTimeSpent" value="45583000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-5" y="0" width="971" height="1086" extended-state="0" />
@@ -649,8 +649,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../auth/src/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
-          <caret line="89" column="13" lean-forward="true" selection-start-line="89" selection-start-column="13" selection-end-line="89" selection-end-column="13" />
+        <state relative-caret-position="248">
+          <caret line="118" column="80" lean-forward="false" selection-start-line="118" selection-start-column="80" selection-end-line="118" selection-end-column="80" />
           <folding />
         </state>
       </provider>
