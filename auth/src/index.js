@@ -113,7 +113,7 @@ const main = async() => {
 
                     if (exists) {
                         success = true;
-                        data = body;
+                        data = JSON.parse(body);
                     }
                     else {
                         data = 'Login failed. Please check your login details.';
