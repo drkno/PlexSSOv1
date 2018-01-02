@@ -1,5 +1,6 @@
 const config = require('config');
 const express = require('express');
+const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const request = require('request');
@@ -32,6 +33,7 @@ const main = async() => {
     const app = express();
 
     app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(morgan('tiny'));
 
     const cekey = await newKey();
 
