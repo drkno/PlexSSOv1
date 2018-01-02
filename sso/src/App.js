@@ -10,7 +10,8 @@ class App extends Component {
         remember: false,
         focus: 0,
         alerts: [],
-        loggedIn: false
+        loggedIn: false,
+        returnTo: ''
     };
 
     async componentWillMount() {
@@ -19,7 +20,8 @@ class App extends Component {
         });
         loggedInReq.json().then(data => {
             this.setState({
-                loggedIn: data.success
+                loggedIn: data.success,
+                returnTo: (new URL(window.location.href)).searchParams.get('returnTo') || ''
             });
         });
         const username = localStorage.getItem('username');
@@ -97,6 +99,11 @@ class App extends Component {
         this.setState({
             loggedIn: true
         });
+        if (this.state.returnTo) {
+            setTimeout(() => {
+                window.location.href = this.state.returnTo;
+            }, 1500);
+        }
     }
 
     loginFailure(data) {
