@@ -1,28 +1,19 @@
-let passwords;
-try {
-    passwords = require('../../config/passwords.json');
-}
-catch (e) {
-    passwords = {};
-}
+const cachedPasswords = {};
 
 const btoa = str => Buffer(str).toString('base64');
 
-const cachedPasswords = {};
-
-for (let app in passwords) {
-    if (passwords.hasOwnProperty(app)) {
-        cachedPasswords[app] = `Basic ${btoa(passwords[app])}`;
-        console.log(`Cached basic-auth password for ${app}`);
-    }
-}
-
-const basicAuth = (app, req, res) => {
-    if (cachedPasswords[app]) {
-        console.log(`Adding basic auth header for app ${app}.`);
-        res.header('Authorization', cachedPasswords[app]);
+module.exports = passwords => {
+    for (let password of passwords) {
+        const authString = `${password.username}:${password.password}`;
+        cachedPasswords[password.name] = `Basic ${btoa(authString)}`;
+        console.log(`Cached basic-auth password for ${password.name}`);
     }
 
+    const basicAuth = (app, req, res) => {
+        if (cachedPasswords[app]) {
+            console.log(`Adding basic auth header with name ${app}.`);
+            res.header('Authorization', cachedPasswords[app]);
+        }
+    };
+    return basicAuth;
 };
-
-module.exports = basicAuth;

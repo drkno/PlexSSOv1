@@ -8,8 +8,16 @@ const crypto = require('crypto');
 const util = require('util');
 
 const plex = require('./plex');
+let passwords;
+try {
+    passwords = require('../config/passwords.json');
+}
+catch {
+    passwords = [];
+}
 const strategies = {
-    'basic': require('./strategy/basicauth')
+    basic: require('./strategy/basicauth')(passwords),
+    sabnzbd: require('./strategy/sabnzbd')(passwords)
 };
 
 const encrypt = (data, key) => {
@@ -71,13 +79,13 @@ const main = async() => {
         });
     });
 
-    app.all('/api/v1/sso', (req, res) => {
+    app.all('/api/v1/sso', async(req, res) => {
         const loginData = decrypt(req.session.data, cekey);
         if (loginData.loginStatus) {
             for (let s in strategies) {
                 const data = req.header(`X-PlexSSO-${s}`);
                 if (data) {
-                    strategies[s](data, req, res);
+                    await strategies[s](data, req, res);
                 }
             }
         }

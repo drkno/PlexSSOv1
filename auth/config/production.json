@@ -1,7 +1,7 @@
 {
     "webroot": "../sso/build",
     "port": 4200,
-    "ombi": "http://localhost:5000",
+    "ombi": "http://127.0.0.1:5000",
     "keybits": 512,
     "keycount": 5,
     "sessionexpiry": 86400000,
