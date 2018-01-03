@@ -82,7 +82,7 @@ const main = async() => {
         }
         updateSession(req, loginData.loginStatus);
         res.status(loginData.loginStatus ? 200 : 401).json({
-            success: loginData.loginStatus
+            success: !!loginData.loginStatus
         });
     });
 
