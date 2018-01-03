@@ -74,9 +74,10 @@ const main = async() => {
     app.all('/api/v1/sso', (req, res) => {
         const loginData = decrypt(req.session.data, cekey);
         if (loginData.loginStatus) {
-            for (let s in req.query) {
-                if (req.query.hasOwnProperty(s) && strategies[s]) {
-                    strategies[s](req.query[s], req, res);
+            for (let s in strategies) {
+                const data = req.header(`X-PlexSSO-${s}`);
+                if (data) {
+                    strategies[s](data, req, res);
                 }
             }
         }
