@@ -17,7 +17,8 @@ catch (e) {
 }
 const strategies = {
     basic: require('./strategy/basicauth')(passwords),
-    sabnzbd: require('./strategy/sabnzbd')(passwords)
+    sabnzbd: require('./strategy/sabnzbd')(passwords),
+    jackett: require('./strategy/jackett')(passwords)
 };
 
 const encrypt = (data, key) => {
