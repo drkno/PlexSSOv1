@@ -1,6 +1,6 @@
 let passwords;
 try {
-    passwords = require('../config/passwords.json');
+    passwords = require('../../config/passwords.json');
 }
 catch (e) {
     passwords = {};
