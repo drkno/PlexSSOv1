@@ -46,8 +46,9 @@ class PlexApi {
             const serverRes = await requestp(`https://plex.tv/api/resources?includeHttps=1&includeRelay=1&${common}&X-Plex-Token=${signInData.user.authentication_token}`);
             const serversData = await xmlp(serverRes.body);
 
+            // todo: anyone could fake a server name on a genuine account
             const servers = serversData.MediaContainer.Device.map(d => d['$'].name);
-            if (!servers.indexOf(config.get('plexservername')) >= 0) {
+            if (servers.indexOf(config.get('plexservername')) < 0) {
                 throw new Error('Server name does not exist');
             }
             signInData.resources = servers;
