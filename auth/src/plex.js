@@ -60,4 +60,4 @@ class PlexApi {
     }
 }
 
-export default PlexApi = new PlexApi();
+exports.module = new PlexApi();

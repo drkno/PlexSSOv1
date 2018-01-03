@@ -20,4 +20,4 @@ const basicAuth = (app, req, res) => {
     res.header('Authorization', cachedPasswords[app] || '');
 };
 
-export default basicAuth;
+exports.module = basicAuth;
