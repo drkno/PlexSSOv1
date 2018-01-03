@@ -7,7 +7,7 @@ const request = require('request');
 const crypto = require('crypto');
 const util = require('util');
 
-const { login } = require('./plex');
+const plex = require('./plex');
 const strategies = {
     'basic': require('./strategy/basicauth')
 };
@@ -92,7 +92,7 @@ const main = async() => {
             data: null
         };
         try {
-            const loginData = await login(req.body.username, req.body.password);
+            const loginData = await plex.login(req.body.username, req.body.password);
             response.success = true;
             response.data = loginData;
         }
