@@ -13,11 +13,16 @@ const cachedPasswords = {};
 for (let app in passwords) {
     if (passwords.hasOwnProperty(app)) {
         cachedPasswords[app] = `Basic ${btoa(passwords[app])}`;
+        console.log(`Cached basic-auth password for ${app}`);
     }
 }
 
 const basicAuth = (app, req, res) => {
-    res.header('Authorization', cachedPasswords[app] || '');
+    if (cachedPasswords[app]) {
+        console.log(`Adding basic auth header for app ${app}.`);
+        res.header('Authorization', cachedPasswords[app]);
+    }
+
 };
 
 module.exports = basicAuth;
