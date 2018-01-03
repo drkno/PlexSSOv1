@@ -12,7 +12,7 @@ let passwords;
 try {
     passwords = require('../config/passwords.json');
 }
-catch {
+catch (e) {
     passwords = [];
 }
 const strategies = {
