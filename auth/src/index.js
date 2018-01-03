@@ -4,9 +4,13 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const request = require('request');
-const xml2js = require('xml2js');
 const crypto = require('crypto');
 const util = require('util');
+
+const { login } = require('./plex');
+const strategies = {
+    'basic': require('./strategy/basicauth')
+};
 
 const encrypt = (data, key) => {
     const cipher = crypto.createCipher('aes256', key);
@@ -37,6 +41,13 @@ const main = async() => {
 
     const cekey = await newKey();
 
+    const updateSession = (req, loggedIn = false) => {
+        req.session.data = encrypt({
+            nowInMinutes: Math.floor(Date.now() / 60e3),
+            loginStatus: !!loggedIn
+        }, cekey);
+    };
+
     const keys = [];
     for (let i = 0; i < config.get('keycount'); i++) {
         const key = await newKey();
@@ -62,83 +73,40 @@ const main = async() => {
 
     app.all('/api/v1/sso', (req, res) => {
         const loginData = decrypt(req.session.data, cekey);
-        loginData.nowInMinutes = Math.floor(Date.now() / 60e3);
-        loginData.loginStatus = !!loginData.loginStatus;
-        req.session.data = encrypt(loginData, cekey);
+        if (loginData.loginStatus) {
+            for (let s in req.query) {
+                if (req.query.hasOwnProperty(s) && strategies[s]) {
+                    strategies[s](req.query[s], req, res);
+                }
+            }
+        }
+        updateSession(req, loginData.loginStatus);
         res.status(loginData.loginStatus ? 200 : 401).json({
             success: loginData.loginStatus
         });
     });
 
-    app.post('/api/v1/login', (req, res) => {
-        const username = req.body.username || '';
-        const password = req.body.password || '';
-        request({
-            url: 'https://plex.tv/users/sign_in.json',
-            method: 'POST',
-            headers: {
-                'X-Plex-Client-Identifier': 'PlexSSOv1',
-                'X-Plex-Product': 'PlexSSO',
-                'X-Plex-Version': '3',
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'Accept': 'application/json'
-            },
-            body: `user[login]=${username}&user[password]=${password}`
-        }, (err, r, body) => {
-            let success = false,
-                data = null;
-            try {
-                data = JSON.parse(body);
-            }
-            catch (e) {}
+    app.post('/api/v1/login', async(req, res) => {
+        let response = {
+            success: false,
+            data: null
+        };
+        try {
+            const loginData = await login(req.body.username, req.body.password);
+            response.success = true;
+            response.data = loginData;
+        }
+        catch (e) {
+            response.success = false;
+            response.data = e.message;
+        }
 
-            data = data || {};
-            data.user = data.user || {};
-            data.user.authentication_token = data.user.authentication_token || '';
-
-            request(`https://plex.tv/api/resources?includeHttps=1&includeRelay=1&X-Plex-Product=PlexSSO&X-Plex-Client-Identifier=PlexSSOv1&X-Plex-Token=${data.user.authentication_token}`,
-                (err2, r2, body2) => {
-                xml2js.parseString(body2, (err3, result) => {
-                    if (err || err2 || err3) {
-                        result = {
-                            MediaContainer: {
-                                Device: []
-                            }
-                        }
-                    }
-                    let exists = false;
-                    try {
-                        const servers = result.MediaContainer.Device.map(d => d['$'].name);
-                        exists = servers.indexOf(config.get('plexservername')) >= 0;
-                    }
-                    catch (e) {}
-
-                    if (exists) {
-                        success = true;
-                        data = JSON.parse(body);
-                    }
-                    else {
-                        data = 'Login failed. Please check your login details.';
-                    }
-                    req.session.data = encrypt({
-                        nowInMinutes: Math.floor(Date.now() / 60e3),
-                        loginStatus: success
-                    }, cekey);
-
-                    res.status(success ? 200 : 401).json({
-                        success: success,
-                        data: data
-                    });
-                });
-            });
-        });
+        updateSession(req, response.success);
+        res.status(response.success ? 200 : 401).json(response);
     });
 
     app.get('/api/v1/logout', (req, res) => {
-        req.session.data = encrypt({
-            nowInMinutes: Math.floor(Date.now() / 60e3),
-            loginStatus: false
-        }, cekey);
+        updateSession();
         res.status(200).json({
             success: true
         });
