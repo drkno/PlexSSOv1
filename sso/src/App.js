@@ -102,7 +102,7 @@ class App extends Component {
         if (this.state.returnTo) {
             setTimeout(() => {
                 window.location.href = this.state.returnTo;
-            }, 1500);
+            }, 1000);
         }
     }
 
@@ -162,10 +162,11 @@ class App extends Component {
                 <img className="card-img-top login-logo" src="/logo.png" alt="Logo" />
                 <label className="logout-label">You already appear to be logged in.</label>
                 <br />
-                <button type="submit"
-                        className="btn btn-danger"
-                        onClick={() => this.logout()}
-                        autoFocus>Logout</button>
+                {
+                    !!this.state.returnTo ?
+                    (<a href={this.state.returnTo} className="login-forgotten-link">Click here if you are not automatically redirected to {this.state.returnTo}.</a>) :
+                    (<button type="submit" className="btn btn-danger" onClick={() => this.logout()} autoFocus>Logout</button>)
+                }
             </form>
         );
     }
