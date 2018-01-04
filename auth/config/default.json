@@ -4,7 +4,8 @@
     "keybits": 512,
     "keycount": 5,
     "sessionexpiry": 86400000,
-    "cookiedomain": "",
-    "plexservername": "",
-    "fanarttvapikey": ""
+    "cookiedomain": "<domain of your cookie. If sso is login.myserver.com then this should be myserver.com>",
+    "plexservername": "<secondary authentication check, should be the name of your server>",
+    "plexserverclientidentifier": "<watch plex load traffic for call to plex.tv/api/resources where you can find this>",
+    "fanarttvapikey": "<project api key for fanart.tv>"
 }
