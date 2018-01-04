@@ -1,5 +1,6 @@
 const cachedPasswords = {};
 
+const config = require('config');
 const util = require('util');
 const request = require('request');
 const Cookies = require('cookies');
