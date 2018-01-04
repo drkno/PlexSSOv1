@@ -46,9 +46,9 @@ class PlexApi {
             const serverRes = await requestp(`https://plex.tv/api/resources?includeHttps=1&includeRelay=1&${common}&X-Plex-Token=${signInData.user.authentication_token}`);
             const serversData = await xmlp(serverRes.body);
 
-            const servers = serversData.MediaContainer.Device.map(d => d['$'].clientIdentifier);
-            const server = servers[servers.indexOf(config.get('plexservername'))];
-            if (!server || server.name !== config.get('plexserverclientidentifier')) {
+            const servers = serversData.MediaContainer.Device.map(d => d['$']);
+            const server = servers[servers.map(s => s.clientIdentifier).indexOf(config.get('plexserverclientidentifier'))];
+            if (!server || server.name !== config.get('plexservername')) {
                 throw new Error('Server does not exist');
             }
             signInData.resources = servers;
