@@ -3,11 +3,12 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
-const request = require('request');
 const crypto = require('crypto');
 const util = require('util');
 
+const background = require('./background');
 const plex = require('./plex');
+
 let passwords;
 try {
     passwords = require('../config/passwords.json');
@@ -69,14 +70,9 @@ const main = async() => {
         domain: config.get('cookiedomain') || void(0)
     }));
 
-    app.get('/api/v1/background', (req, res) => {
-        request(`${config.get('ombi')}/api/v1/Images/background/`, (err, _, body) => {
-            if (err) {
-                res.status(500).send(body);
-            }
-            else {
-                res.json(JSON.parse(body));
-            }
+    app.get('/api/v1/background', async(req, res) => {
+        res.json({
+            url: await background()
         });
     });
 
