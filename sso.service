@@ -1,0 +1,10 @@
+[Unit]
+Description=PlexSSO
+
+[Service]
+ExecStart=/usr/bin/node /opt/sso/auth/src/index.js
+WorkingDirectory=/opt/sso/auth
+User=sso
+
+[Install]
+WantedBy=multi-user.target
