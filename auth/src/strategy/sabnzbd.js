@@ -29,8 +29,8 @@ module.exports = passwords => {
                 body: `username=${p.username}&password=${p.password}`
             });
 
-            const cookies = signInRes.headers['set-cookie'];
-            for (let cookie of cookies) {
+            const rcookies = signInRes.headers['set-cookie'];
+            for (let cookie of rcookies) {
                 const spl = cookie.split(';')[0].split('=');
                 cookies.set(spl[0], spl[1]);
             }
