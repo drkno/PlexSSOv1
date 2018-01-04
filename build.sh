@@ -3,6 +3,7 @@ set -e
 
 cd sso
 npm install
+npm run build
 cd ../auth
 npm install
 cd config
