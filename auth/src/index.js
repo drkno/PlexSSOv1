@@ -66,7 +66,7 @@ const main = async() => {
         name: 'kPlexSSOKookie',
         keys: keys,
         maxAge: config.get('sessionexpiry'),
-        domain: config.get('domain') || void(0)
+        domain: config.get('cookiedomain') || void(0)
     }));
 
     app.get('/api/v1/background', (req, res) => {

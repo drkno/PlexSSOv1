@@ -1,10 +1,10 @@
 {
     "webroot": "public",
     "port": 4200,
-    "ombi": "http://pms.makereti.co.nz",
     "keybits": 512,
     "keycount": 5,
     "sessionexpiry": 86400000,
-    "domain": "",
-    "plexservername": "Morpheus"
+    "cookiedomain": "",
+    "plexservername": "",
+    "fanarttvapikey": ""
 }
