@@ -18,7 +18,6 @@ catch (e) {
 }
 const strategies = {
     basic: require('./strategy/basicauth')(passwords),
-    sabnzbd: require('./strategy/sabnzbd')(passwords),
     jackett: require('./strategy/jackett')(passwords)
 };
 
