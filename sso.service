@@ -4,6 +4,7 @@ Description=PlexSSO
 [Service]
 ExecStart=/usr/bin/node /opt/sso/auth/src/index.js
 WorkingDirectory=/opt/sso/auth
+Environment="NODE_ENV=production"
 User=sso
 
 [Install]
