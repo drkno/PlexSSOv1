@@ -111,7 +111,7 @@ const main = async() => {
     });
 
     app.get('/api/v1/logout', (req, res) => {
-        updateSession();
+        updateSession(req);
         res.status(200).json({
             success: true
         });
