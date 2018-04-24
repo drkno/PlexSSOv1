@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const crypto = require('crypto');
 const util = require('util');
-const request = require('request');
 
 const background = require('./background');
 const plex = require('./plex');
@@ -70,18 +69,7 @@ const main = async() => {
         domain: config.get('cookiedomain') || void(0)
     }));
 
-    app.get('/api/v1/background', async(req, res) => {
-        const url = await background();
-        res.json({
-            url: `/api/v1/backgroundProxy/${encodeURIComponent(Buffer.from(url.substr(32)).toString('base64'))}`
-        });
-    });
-
-    app.get('/api/v1/backgroundProxy/:id', async(req, res) => {
-        const id = Buffer.from(decodeURIComponent(req.params.id), 'base64').toString('ascii');
-        const url = `https://assets.fanart.tv/fanart/${id}`;
-        request.get(url).pipe(res);
-    });
+    await background(app);
 
     app.all('/api/v1/sso', async(req, res) => {
         const loginData = decrypt(req.session.data, cekey);
