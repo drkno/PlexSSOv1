@@ -31,29 +31,6 @@ const backgrounds = {
         275274
     ]
 };
-const randomArrayItem = array => array[Math.floor(Math.random() * array.length)];
-const getBackgroundImage = async() => {
-    const type = randomArrayItem(Object.keys(backgrounds));
-    const id = randomArrayItem(backgrounds[type]);
-    const res = await requestp(`http://webservice.fanart.tv/v3/${type}/${id}?api_key=${apiKey}`);
-    const j = JSON.parse(res.body);
-    let images = [];
-    if (j.showbackground) {
-        images = j.showbackground;
-    }
-    else if (j.moviebackground) {
-        images = j.moviebackground;
-    }
-    else {
-        return '';
-    }
-
-    const image = randomArrayItem(images);
-    return {
-        id: image.id,
-        url: image.url
-    };
-};
 
 const checkExists = async(p) => {
     try {
@@ -71,17 +48,50 @@ const checkExists = async(p) => {
     }
 };
 
+const downloadFile = (uri, loc, cb) => {
+    const pipe = request(uri).pipe(fs.createWriteStream(loc));
+    pipe.on('error', cb);
+    pipe.on('close', cb);
+};
+
+const downloadFilep = util.promisify(downloadFile);
+
+const randomArrayItem = array => array[Math.floor(Math.random() * array.length)];
+const getBackgroundImage = async() => {
+    const type = randomArrayItem(Object.keys(backgrounds));
+    const id = randomArrayItem(backgrounds[type]);
+    const cachePath = path.join(cacheDir, `${type}-${id}.json`);
+    if (!(await checkExists(cachePath))) {
+        await downloadFilep(`http://webservice.fanart.tv/v3/${type}/${id}?api_key=${apiKey}`, cachePath);
+    }
+    const data = await readFilep(cachePath, 'utf8');
+    const j = JSON.parse(data.replace(/^\uFEFF/, ''));
+    let images = [];
+    if (j.showbackground) {
+        images = j.showbackground;
+    }
+    else if (j.moviebackground) {
+        images = j.moviebackground;
+    }
+    else {
+        return '';
+    }
+    const image = randomArrayItem(images);
+    return {
+        id: image.id,
+        url: image.url
+    };
+};
+
 const ensureDirExists = async(dir) => {
     if (!(await checkExists(dir))) {
         await mkdirp(dir);
     }
 };
 
-const downloadFile = (uri, loc, cb) => {
-    request(uri).pipe(fs.createWriteStream(loc)).on('close', cb);
-};
-
-const downloadFilep = util.promisify(downloadFile);
+process.on('uncaughtException', function(err) {
+    console.log('Caught exception: ' + err);
+});
 
 module.exports = async(app) => {
     app.get('/api/v1/background', async(req, res) => {
@@ -92,10 +102,8 @@ module.exports = async(app) => {
 
     app.get('/api/v2/backgroundProxy', async(req, res) => {
         try {
-            const backgroundPromise = getBackgroundImage();
             await ensureDirExists(cacheDir);
-            const background = await backgroundPromise;
-            
+            const backgroundPromise = await getBackgroundImage();           
             const cachePath = path.join(cacheDir, `${background.id}.jpg`);
             if (!(await checkExists(cachePath))) {
                 await downloadFilep(background.url, cachePath);
