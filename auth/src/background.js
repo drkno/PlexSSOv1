@@ -103,7 +103,7 @@ module.exports = async(app) => {
     app.get('/api/v2/backgroundProxy', async(req, res) => {
         try {
             await ensureDirExists(cacheDir);
-            const backgroundPromise = await getBackgroundImage();           
+            const background = await getBackgroundImage();           
             const cachePath = path.join(cacheDir, `${background.id}.jpg`);
             if (!(await checkExists(cachePath))) {
                 await downloadFilep(background.url, cachePath);
