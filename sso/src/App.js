@@ -4,7 +4,7 @@ import './App.css';
 
 class App extends Component {
     state = {
-        background: '',
+        // background: '',
         username: '',
         password: '',
         remember: false,
@@ -32,11 +32,11 @@ class App extends Component {
             remember: !!(username || password),
             focus: [username, password, null].indexOf(null)
         });
-        const req = await fetch('/api/v1/background/');
-        const data = await req.json();
-        this.setState({
-            background: data.url
-        });
+        // const req = await fetch('/api/v1/background/');
+        // const data = await req.json();
+        // this.setState({
+        //     background: data.url
+        // });
     }
 
     createAlert(message, type) {
@@ -146,8 +146,7 @@ class App extends Component {
 
     render() {
         return (
-            <div className="App"
-                 style={{backgroundImage: `linear-gradient(-10deg, transparent 20%, rgba(0, 0, 0, 0.7) 20%, rgba(0, 0, 0, 0.7) 80%, transparent 80%), url("${this.state.background}")`}}>
+            <div className="App">
                 <AlertList alerts={this.state.alerts} />
                 <div className="card login-card">
                     {this.state.loggedIn ? this.renderLogout() : this.renderLogin()}
