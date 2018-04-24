@@ -62,7 +62,12 @@ const getBackgroundImage = async() => {
     const id = randomArrayItem(backgrounds[type]);
     const cachePath = path.join(cacheDir, `${type}-${id}.json`);
     if (!(await checkExists(cachePath))) {
-        await downloadFilep(`http://webservice.fanart.tv/v3/${type}/${id}?api_key=${apiKey}`, cachePath);
+        const url = `http://webservice.fanart.tv/v3/${type}/${id}?api_key=${apiKey}`;
+        console.log(`Downloading background search from ${url}.`);
+        await downloadFilep(url, cachePath);
+    }
+    else {
+        console.log('Using background search cache.');
     }
     const data = await readFilep(cachePath, 'utf8');
     const j = JSON.parse(data.replace(/^\uFEFF/, ''));
@@ -106,7 +111,11 @@ module.exports = async(app) => {
             const background = await getBackgroundImage();           
             const cachePath = path.join(cacheDir, `${background.id}.jpg`);
             if (!(await checkExists(cachePath))) {
+                console.log(`Downloading background into cache ${background.url}`);
                 await downloadFilep(background.url, cachePath);
+            }
+            else {
+                console.log('Serving background from cache.');
             }
             res.sendFile(cachePath);
         }
