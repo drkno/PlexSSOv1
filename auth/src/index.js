@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const crypto = require('crypto');
 const util = require('util');
+const request = require('request');
 
 const background = require('./background');
 const plex = require('./plex');
@@ -70,9 +71,16 @@ const main = async() => {
     }));
 
     app.get('/api/v1/background', async(req, res) => {
+        const url = await background();
         res.json({
-            url: await background()
+            url: `/api/v1/backgroundProxy/${encodeURIComponent(Buffer.from(url.substr(32)).toString('base64'))}`
         });
+    });
+
+    app.get('/api/v1/backgroundProxy/:id', async(req, res) => {
+        const id = Buffer.from(decodeURIComponent(req.params.id), 'base64').toString('ascii');
+        const url = `https://assets.fanart.tv/fanart/${id}`;
+        request.get(url).pipe(res);
     });
 
     app.all('/api/v1/sso', async(req, res) => {
@@ -111,7 +119,7 @@ const main = async() => {
     });
 
     app.get('/api/v1/logout', (req, res) => {
-        updateSession();
+        updateSession(req);
         res.status(200).json({
             success: true
         });
