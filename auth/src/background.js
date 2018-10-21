@@ -119,7 +119,10 @@ module.exports = async(app) => {
                 console.log('Serving background from cache.');
             }
             if (nginxCache) {
-                res.status(302).location(path.join(nginxCache, fileName));
+                const nginxLocation = path.join(nginxCache, fileName);
+                res.status(302).location().json({
+                    url: nginxLocation
+                });
             }
             else {
                 res.sendFile(cachePath);
