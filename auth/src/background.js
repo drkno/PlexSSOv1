@@ -4,13 +4,13 @@ const config = require('config');
 const fs = require('fs');
 const path = require('path');
 
-const requestp = util.promisify(request);
 const statp = util.promisify(fs.stat);
 const mkdirp = util.promisify(fs.mkdir);
 const readFilep = util.promisify(fs.readFile);
 
 const apiKey = config.get('fanarttvapikey');
 const cacheDir = config.has('cachedir') ? config.get('cachedir') : `${process.cwd()}/cache`;
+const nginxCache = config.has('cachedirnginx') ? config.get('cachedirnginx') : null;
 
 const backgrounds = {
     movies: [
@@ -108,8 +108,9 @@ module.exports = async(app) => {
     app.get('/api/v2/backgroundProxy', async(req, res) => {
         try {
             await ensureDirExists(cacheDir);
-            const background = await getBackgroundImage();           
-            const cachePath = path.join(cacheDir, `${background.id}.jpg`);
+            const background = await getBackgroundImage();
+            const fileName = `${background.id}.jpg`;
+            const cachePath = path.join(cacheDir, fileName);
             if (!(await checkExists(cachePath))) {
                 console.log(`Downloading background into cache ${background.url}`);
                 await downloadFilep(background.url, cachePath);
@@ -117,7 +118,12 @@ module.exports = async(app) => {
             else {
                 console.log('Serving background from cache.');
             }
-            res.sendFile(cachePath);
+            if (nginxCache) {
+                res.status(302).location(path.join(nginxCache, fileName));
+            }
+            else {
+                res.sendFile(cachePath);
+            }
         }
         catch (e) {
             try {
