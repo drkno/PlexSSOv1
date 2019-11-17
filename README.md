@@ -1,3 +1,7 @@
+> :warning: **This is unmaintained**: The new version at [https://github.com/mrkno/PlexSSOv2](https://github.com/mrkno/PlexSSOv2) is the recommended replacement.
+
+---
+
 ## PlexSSO
 A better nginx auth_request based SSO using Plex as an authentication provider.
 
